@@ -42,6 +42,7 @@ export class ControllerFactory {
 
 		endpoints.forEach((endpoint) => {
 			const separatedMiddlewares = this._separateMiddlewares(endpoint.middlewares ?? [])
+			if (!separatedMiddlewares.nonOverrideable.length) return
 			router[endpoint.method](endpoint.path, ...separatedMiddlewares.nonOverrideable)
 		})
 
