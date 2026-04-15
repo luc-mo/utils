@@ -1,15 +1,10 @@
 import { defineConfig } from 'tsup'
 
 export default defineConfig({
-	entry: {
-		index: 'src/index.ts',
-		http: 'src/controller-factory/index.ts',
-		di: 'src/injectable-dependency/index.ts',
-	},
+	entry: ['src/index.ts'],
 	format: ['cjs', 'esm'],
-	splitting: true,
 	tsconfig: './tsconfig.json',
-	minify: false,
+	minify: true,
 	clean: true,
 	treeshake: true,
 	dts: true,

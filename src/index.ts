@@ -1,2 +1,2 @@
-export { Http } from './controller-factory'
-export { DI } from './injectable-dependency'
+export * from './controller-factory'
+export * from './injectable-dependency'

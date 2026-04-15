@@ -1,9 +1,9 @@
 {
 	"name": "@snowdrive/utils",
-	"version": "1.0.0",
+	"version": "1.0.1",
 	"author": "Luciano Morales",
 	"license": "MIT",
-	"description": "Utilidades que reutilizo constantemente en mis proyectos.",
+	"description": "Colección de utilidades reutilizables desarrolladas en TypeScript.",
 	"publishConfig": {
 		"access": "public",
 		"tag": "latest"
@@ -50,26 +50,6 @@
 			"require": {
 				"types": "./dist/index.d.ts",
 				"default": "./dist/index.js"
-			}
-		},
-		"./http": {
-			"import": {
-				"types": "./dist/http.d.mts",
-				"default": "./dist/http.mjs"
-			},
-			"require": {
-				"types": "./dist/http.d.ts",
-				"default": "./dist/http.js"
-			}
-		},
-		"./di": {
-			"import": {
-				"types": "./dist/di.d.mts",
-				"default": "./dist/di.mjs"
-			},
-			"require": {
-				"types": "./dist/di.d.ts",
-				"default": "./dist/di.js"
 			}
 		}
 	}
