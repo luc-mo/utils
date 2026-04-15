@@ -5,8 +5,9 @@ import type { CorsOptions } from 'cors'
 import type { IApp, IController, IAppConfig, IControllerConfig } from './types'
 
 export class ControllerFactory {
-	public createApp({ port, middlewares, controllers, corsOptions }: IAppConfig): IApp {
+	public createApp({ port, middlewares, controllers, jsonOptions, corsOptions }: IAppConfig): IApp {
 		const router = express()
+		this._applyJson(router, jsonOptions)
 		this._applyCors(router, corsOptions)
 
 		middlewares.forEach((middleware) => {
@@ -30,9 +31,11 @@ export class ControllerFactory {
 		path,
 		middlewares,
 		endpoints,
+		jsonOptions,
 		corsOptions,
 	}: IControllerConfig): IController {
 		const router = type === 'app' ? express() : express.Router()
+		this._applyJson(router, jsonOptions)
 		this._applyCors(router, corsOptions)
 
 		endpoints.forEach((endpoint) => {
@@ -47,6 +50,19 @@ export class ControllerFactory {
 		})
 
 		return { path, router }
+	}
+
+	private _applyJson(
+		router: Express | Router,
+		jsonOptions?: boolean | Parameters<typeof express.json>[0]
+	) {
+		if (jsonOptions === true) {
+			router.use(express.json())
+		}
+
+		if (jsonOptions && jsonOptions !== true) {
+			router.use(express.json(jsonOptions))
+		}
 	}
 
 	private _applyCors(router: Express | Router, corsOptions?: boolean | CorsOptions) {

@@ -1,4 +1,4 @@
-import type { Express, Router, RequestHandler } from 'express'
+import type { Express, Router, RequestHandler, json } from 'express'
 import type { CorsOptions } from 'cors'
 
 // Return types
@@ -18,6 +18,7 @@ export interface IAppConfig {
 	port: string
 	middlewares: RequestHandler[]
 	controllers: IController[]
+	jsonOptions?: boolean | Parameters<typeof json>[0]
 	corsOptions?: boolean | CorsOptions
 }
 
@@ -26,6 +27,7 @@ export interface IControllerConfig {
 	path: string
 	middlewares: RequestHandler[]
 	endpoints: IEndpointConfig[]
+	jsonOptions?: boolean | Parameters<typeof json>[0]
 	corsOptions?: boolean | CorsOptions
 }
 
