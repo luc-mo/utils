@@ -1,13 +1,15 @@
 # @snowdrive/utils
+
 Colección de utilidades reutilizables desarrolladas en TypeScript.
 
 ## Instalación
+
 ```bash
 npm install @snowdrive/utils
 pnpm add @snowdrive/utils
 ```
 
-Si utilizas el namespace `Http`, instala las peer dependencies:
+Si utilizas `ControllerFactory`, instala las peer dependencies:
 
 ```bash
 npm install express cors
@@ -15,23 +17,19 @@ pnpm add express cors
 ```
 
 ## Uso
-Puedes importar la librería completa o por subpath para mejor tree-shaking:
-```typescript
-// Completo
-import { Http, DI } from '@snowdrive/utils'
 
-// Por subpath
-import { Http } from '@snowdrive/utils/http'
-import { DI } from '@snowdrive/utils/di'
+```typescript
+import { ControllerFactory, InjectableDependency } from '@snowdrive/utils'
 ```
 
-## Namespaces
+## API
 
-### `Http`
+### `ControllerFactory`
+
 Utilidades para crear aplicaciones y controladores Express.
 
 ```typescript
-const factory = new Http.ControllerFactory()
+const factory = new ControllerFactory()
 
 const controller = factory.createController({
   path: '/users',
@@ -54,21 +52,23 @@ const app = factory.createApp({
 app.listen()
 ```
 
-### `DI`
+### `InjectableDependency`
+
 Mixin para inyección de dependencias compatible con Awilix.
 
 ```typescript
-class UserService extends DI.InjectableDependency('userRepository') {
+declare module '@snowdrive/utils' {
+  interface IDependencyMap {
+    userRepository: UserRepository
+  }
+}
+
+class UserService extends InjectableDependency('userRepository') {
   getUsers() {
     return this._userRepository.findAll()
   }
 }
 ```
-
-## Scripts
-- `build`: Compila el proyecto con `tsup`.
-- `lint`: Revisa y corrige el código con Biome.
-- `format`: Formatea el código con Biome.
 
 ## Licencia
 MIT

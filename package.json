@@ -1,6 +1,6 @@
 {
 	"name": "@snowdrive/utils",
-	"version": "1.0.1",
+	"version": "1.0.2",
 	"author": "Luciano Morales",
 	"license": "MIT",
 	"description": "Colección de utilidades reutilizables desarrolladas en TypeScript.",
