@@ -1,4 +1,4 @@
-import type { Express, Router, RequestHandler, json } from 'express'
+import type { Express, Router, RequestHandler } from 'express'
 import type { CorsOptions } from 'cors'
 
 // Return types
@@ -18,16 +18,14 @@ export interface IAppConfig {
 	port: string
 	middlewares: RequestHandler[]
 	controllers: IController[]
-	jsonOptions?: boolean | Parameters<typeof json>[0]
 	corsOptions?: boolean | CorsOptions
 }
 
 export interface IControllerConfig {
 	type?: 'app' | 'router'
 	path: string
-	middlewares: RequestHandler[]
+	middlewares: IMiddlewareConfig[]
 	endpoints: IEndpointConfig[]
-	jsonOptions?: boolean | Parameters<typeof json>[0]
 	corsOptions?: boolean | CorsOptions
 }
 
@@ -35,6 +33,13 @@ export interface IEndpointConfig {
 	method: 'get' | 'post' | 'put' | 'patch' | 'delete'
 	path: string
 	overrides?: RequestHandler[]
-	middlewares?: RequestHandler[]
+	middlewares?: IMiddlewareConfig[]
 	handler: RequestHandler
 }
+
+export type IMiddlewareConfig =
+	| RequestHandler
+	| {
+			overrideable: boolean
+			handler: RequestHandler
+	  }

@@ -1,13 +1,12 @@
 import express from 'express'
 import cors from 'cors'
-import type { Express, Router } from 'express'
+import type { Express, Router, RequestHandler } from 'express'
 import type { CorsOptions } from 'cors'
-import type { IApp, IController, IAppConfig, IControllerConfig } from './types'
+import type { IApp, IController, IAppConfig, IControllerConfig, IMiddlewareConfig } from './types'
 
 export class ControllerFactory {
-	public createApp({ port, middlewares, controllers, jsonOptions, corsOptions }: IAppConfig): IApp {
+	public createApp({ port, middlewares, controllers, corsOptions }: IAppConfig): IApp {
 		const router = express()
-		this._applyJson(router, jsonOptions)
 		this._applyCors(router, corsOptions)
 
 		middlewares.forEach((middleware) => {
@@ -31,38 +30,36 @@ export class ControllerFactory {
 		path,
 		middlewares,
 		endpoints,
-		jsonOptions,
 		corsOptions,
 	}: IControllerConfig): IController {
 		const router = type === 'app' ? express() : express.Router()
-		this._applyJson(router, jsonOptions)
+		const separatedMiddlewares = this._separateMiddlewares(middlewares)
 		this._applyCors(router, corsOptions)
+
+		separatedMiddlewares.nonOverrideable.forEach((middleware) => {
+			router.use(middleware)
+		})
+
+		endpoints.forEach((endpoint) => {
+			const separatedMiddlewares = this._separateMiddlewares(endpoint.middlewares ?? [])
+			router[endpoint.method](endpoint.path, ...separatedMiddlewares.nonOverrideable)
+		})
 
 		endpoints.forEach((endpoint) => {
 			if (!endpoint.overrides) return
 			router[endpoint.method](endpoint.path, ...endpoint.overrides)
 		})
-		middlewares.forEach((middleware) => {
+
+		separatedMiddlewares.overrideable.forEach((middleware) => {
 			router.use(middleware)
 		})
+
 		endpoints.forEach((endpoint) => {
-			router[endpoint.method](endpoint.path, ...(endpoint.middlewares ?? []), endpoint.handler)
+			const separatedMiddlewares = this._separateMiddlewares(endpoint.middlewares ?? [])
+			router[endpoint.method](endpoint.path, ...separatedMiddlewares.overrideable, endpoint.handler)
 		})
 
 		return { path, router }
-	}
-
-	private _applyJson(
-		router: Express | Router,
-		jsonOptions?: boolean | Parameters<typeof express.json>[0]
-	) {
-		if (jsonOptions === true) {
-			router.use(express.json())
-		}
-
-		if (jsonOptions && jsonOptions !== true) {
-			router.use(express.json(jsonOptions))
-		}
 	}
 
 	private _applyCors(router: Express | Router, corsOptions?: boolean | CorsOptions) {
@@ -73,5 +70,21 @@ export class ControllerFactory {
 		if (corsOptions && corsOptions !== true) {
 			router.use(cors(corsOptions))
 		}
+	}
+
+	private _separateMiddlewares(middlewares: IMiddlewareConfig[]) {
+		const overrideable: RequestHandler[] = []
+		const nonOverrideable: RequestHandler[] = []
+		middlewares.forEach((middleware) => {
+			if (typeof middleware === 'function') {
+				overrideable.push(middleware)
+				return
+			} else if (middleware.overrideable) {
+				overrideable.push(middleware.handler)
+			} else {
+				nonOverrideable.push(middleware.handler)
+			}
+		})
+		return { overrideable, nonOverrideable }
 	}
 }
